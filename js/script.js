@@ -1,6 +1,7 @@
 'use strict';
 
 class Todo {
+
     constructor(form, input, todoList, todoCompleted) {
         this.form = document.querySelector(form);
         this.input = document.querySelector(input);
@@ -10,21 +11,22 @@ class Todo {
     }
 
     addToStorage() {
-        localStorage.setItem('toDoList', JSON.stringify([...this.todoData]))
+        localStorage.setItem('toDoList', JSON.stringify([...this.todoData]));
     }
 
     render() {
         this.todoList.textContent = '';
         this.todoCompleted.textContent = '';
-        this.todoData.forEach(this.createItem);
+        this.todoData.forEach(this.createItem, this);
         this.addToStorage();
     }
 
-    createItem = (todo) => {
+    createItem(todo) {
         const li = document.createElement('li');
-            li.classList.add('todo-item');
-            li.key = todo.key;
-            li.insertAdjacentHTML('beforeend', `
+        li.classList.add('todo-item');
+        li.key = todo.key;
+
+        li.insertAdjacentHTML('beforeend', `
                 <span class="text-todo">${todo.value}</span>
                 <div class="todo-buttons">
                     <button class="todo-remove"></button>
@@ -35,56 +37,67 @@ class Todo {
             this.todoCompleted.append(li);
         } else {
             this.todoList.append(li);
-        };
-       
+        }
+
     }
-    
+
     addTodo(e) {
         e.preventDefault();
-            if (this.input.value.trim()) {
-                const newTodo = {
-                    value: this.input.value,
-                    completed: false,
-                    key: this.generateKey(),
-                };
-                this.todoData.set(newTodo.key, newTodo);
-                this.input.value = '';
-                this.render();
-            } else {
-                alert('Пустое дело добавить нельзя!');
-            }
+        if (this.input.value.trim()) {
+            const newTodo = {
+                value: this.input.value,
+                completed: false,
+                key: this.generateKey(),
+            };
+            this.todoData.set(newTodo.key, newTodo);
+            this.input.value = '';
+            this.render();
+        } else {
+            alert('Пустое дело добавить нельзя!');
+        }
     }
 
     generateKey() {
         return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     }
 
-    deleteItem() {
-        console.log('удалено');
-        console.log(this.todoData);
-        console.log(todo.key);
+    deleteItem(itemKey) {
+        let itemBox = document.querySelectorAll('.todo-item');
+
+        for (let i = 0; i < itemBox.length; i++) {
+
+            if (itemBox[i].key === itemKey) {
+                itemBox[i].querySelector('.text-todo').remove();
+                itemBox[i].classList.remove('todo-item');
+            }
+        }
     }
 
-    completedItem() {
-        console.log('выполнено');
-        console.log(todo.key);
-
+    completedItem(itemKey) {
+        let itemBox = document.querySelectorAll('.todo-item');
+        for (let i = 0; i < itemBox.length; i++) {
+            if (itemBox[i].key === itemKey) {
+                itemBox[i].classList.add('todo-completed');
+                itemBox[i].complited = true;
+            }
+        }
     }
 
     handler() {
         const todoContainer = document.querySelector('.todo-container');
-            todoContainer.onclick = function(event) {
-                let target = event.target;
-                    if(target.tagName !='BUTTON'){
-                        return;
-                    } else {
-                        if(target.className === 'todo-remove') {
-                            todo.deleteItem();
-                        } else {
-                            todo.completedItem();
-                        }
-                    };
+        todoContainer.onclick = function (event) {
+            const target = event.target;
+            if (target.tagName != 'BUTTON') {
+                return;
+            } else {
+                const itemKey = target.closest('.todo-item').key;
+                if (target.className === 'todo-remove') {
+                    todo.deleteItem(itemKey);
+                } else {
+                    todo.completedItem(itemKey);
+                }
             }
+        };
     }
 
     init() {
