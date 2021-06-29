@@ -62,25 +62,16 @@ class Todo {
     }
 
     deleteItem(itemKey) {
-        let itemBox = document.querySelectorAll('.todo-item');
-
-        for (let i = 0; i < itemBox.length; i++) {
-
-            if (itemBox[i].key === itemKey) {
-                itemBox[i].querySelector('.text-todo').remove();
-                itemBox[i].classList.remove('todo-item');
-            }
-        }
+        this.todoData.delete(itemKey);
+        this.addToStorage();
+        this.render();
     }
 
     completedItem(itemKey) {
-        let itemBox = document.querySelectorAll('.todo-item');
-        for (let i = 0; i < itemBox.length; i++) {
-            if (itemBox[i].key === itemKey) {
-                itemBox[i].classList.add('todo-completed');
-                itemBox[i].complited = true;
-            }
-        }
+        const elem = this.todoData.get(itemKey);
+        elem.completed = !elem.completed;
+        this.addToStorage();
+        this.render();
     }
 
     handler() {
